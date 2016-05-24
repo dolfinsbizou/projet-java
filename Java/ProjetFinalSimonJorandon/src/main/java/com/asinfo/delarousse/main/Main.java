@@ -38,10 +38,10 @@ public class Main {
         try
         {
             expressions = ExpressionDelahochienne.getAll();
-            for (ExpressionDelahochienne expression : expressions)
+            expressions.stream().forEach((expression) ->
             {
                 System.out.println(expression);
-            }
+            });
         }
         catch (SQLException ex)
         {
