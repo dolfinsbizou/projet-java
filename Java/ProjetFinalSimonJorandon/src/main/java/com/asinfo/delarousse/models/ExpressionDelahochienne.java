@@ -77,7 +77,25 @@ public class ExpressionDelahochienne
             if(!DB.getConnection().isClosed())
             {
                 PreparedStatement statement = DB.getConnection().prepareStatement("DELETE FROM ExpressionsDelahochiennes WHERE id = ?");
+                
                 statement.setInt(1, i);
+                
+                statement.execute();
+            }
+        }
+    }
+    
+    public static void updateAtIndex(int index, String expression, String meaning /*ADD BLOB*/) throws SQLException
+    {
+        if(DB.getConnection() != null)
+        {
+            if(!DB.getConnection().isClosed())
+            {
+                PreparedStatement statement = DB.getConnection().prepareStatement("UPDATE ExpressionsDelahochiennes SET expression = ?, signification = ? WHERE id = ?");
+                statement.setString(1, expression);
+                statement.setString(2, meaning);
+                statement.setInt(3, index);
+                
                 statement.execute();
             }
         }

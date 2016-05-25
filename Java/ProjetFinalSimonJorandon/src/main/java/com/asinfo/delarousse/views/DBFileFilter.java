@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.asinfo.delarousse.models;
+package com.asinfo.delarousse.views;
 
 import java.io.File;
 import javax.swing.filechooser.FileFilter;

@@ -9,6 +9,7 @@ import com.asinfo.delarousse.models.ExpressionDelahochienne;
 import com.asinfo.delarousse.views.Window;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +50,18 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         return entries!=null?entries.get(i):null;
     }
     
+    public int getListIndexFromDBIndex(int i)
+    {
+        int r = 0;
+        for (ExpressionDelahochienne e : entries)
+        {
+            if(e.getId() == i)
+                return r;
+            r++;
+        }
+        return -1;
+    }
+    
     public void deleteEntryAt(int i)
     {
         try
@@ -59,6 +72,19 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         catch (SQLException ex)
         {
             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void updateEntryAt(int i, String expression, String meaning)
+    {
+        try
+        {
+            ExpressionDelahochienne.updateAtIndex(entries.get(i).getId(), expression, meaning);
+            entries = ExpressionDelahochienne.getList();
+        }
+        catch (SQLException ex)
+        {
+            Logger.getLogger(ListDataControl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
