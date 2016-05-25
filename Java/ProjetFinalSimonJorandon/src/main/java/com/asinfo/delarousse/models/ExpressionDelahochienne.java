@@ -19,14 +19,14 @@ public class ExpressionDelahochienne
 
     int id;
     String expression;
-    String meanning;
+    String meaning;
     String picture;
 
-    public ExpressionDelahochienne(int ID, String Expression, String Meanning, String Picture)
+    public ExpressionDelahochienne(int ID, String Expression, String Meaning, String Picture)
     {
         id = ID;
         expression = Expression;
-        meanning = Meanning;
+        meaning = Meaning;
         picture = Picture;
     }
 
@@ -35,26 +35,26 @@ public class ExpressionDelahochienne
      * @return
      * @throws SQLException
      */
-    public static ArrayList<ExpressionDelahochienne> getAll() throws SQLException
+    public static ArrayList<ExpressionDelahochienne> getList() throws SQLException
     {
         Statement statement = DB.getConnection().createStatement();
         
         ArrayList<ExpressionDelahochienne> res = new ArrayList();
         
-        try (ResultSet result = statement.executeQuery("SELECT * FROM ExpressionsDelahochiennes"))
+        try (ResultSet result = statement.executeQuery("SELECT id, expression, signification, illustration FROM ExpressionsDelahochiennes ORDER BY LOWER(expression)"))
         {
             while (result.next()) {
                 int ID;
                 String ExpressionTrans;
-                String Meanning;
+                String Meaning;
                 String Picture;
                 
                 ID = result.getInt("id");
                 ExpressionTrans = result.getString("expression");
-                Meanning = result.getString("signification");
+                Meaning = result.getString("signification");
                 Picture = result.getString("illustration");
                 
-                res.add(new ExpressionDelahochienne(ID, ExpressionTrans, Meanning, Picture));
+                res.add(new ExpressionDelahochienne(ID, ExpressionTrans, Meaning, Picture));
                 
             }
         }
@@ -62,10 +62,50 @@ public class ExpressionDelahochienne
         
     }
 
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getExpression()
+    {
+        return expression;
+    }
+
+    public void setExpression(String expression)
+    {
+        this.expression = expression;
+    }
+
+    public String getMeaning()
+    {
+        return meaning;
+    }
+
+    public void setMeaning(String meaning)
+    {
+        this.meaning = meaning;
+    }
+
+    public String getPicture()
+    {
+        return picture;
+    }
+
+    public void setPicture(String picture)
+    {
+        this.picture = picture;
+    }
+
     @Override
     public String toString()
     {
-        return "ExpressionDelahochienne{" + "id=" + id + ", expression=" + expression + ", meanning=" + meanning + ", picture=" + picture + '}';
+        return "ExpressionDelahochienne{" + "id=" + id + ", expression=" + expression + ", meanning=" + meaning + ", picture=" + picture + '}';
     }
 
     

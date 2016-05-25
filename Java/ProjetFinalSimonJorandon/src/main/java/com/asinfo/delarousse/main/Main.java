@@ -5,12 +5,10 @@
  */
 package com.asinfo.delarousse.main;
 
-import com.asinfo.delarousse.models.ExpressionDelahochienne;
+import com.asinfo.delarousse.controllers.Controller;
 import com.asinfo.delarousse.models.DB;
 import static java.lang.System.exit;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,19 +31,7 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             exit(1);
         }
-         
-        ArrayList<ExpressionDelahochienne> expressions;
-        try
-        {
-            expressions = ExpressionDelahochienne.getAll();
-            expressions.stream().forEach((expression) ->
-            {
-                System.out.println(expression);
-            });
-        }
-        catch (SQLException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
+        Controller controller = new Controller();
     }
 }
