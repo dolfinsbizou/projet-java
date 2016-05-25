@@ -5,6 +5,7 @@
  */
 package com.asinfo.delarousse.models;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -37,29 +38,49 @@ public class ExpressionDelahochienne
      */
     public static ArrayList<ExpressionDelahochienne> getList() throws SQLException
     {
-        Statement statement = DB.getConnection().createStatement();
-        
-        ArrayList<ExpressionDelahochienne> res = new ArrayList();
-        
-        try (ResultSet result = statement.executeQuery("SELECT id, expression, signification, illustration FROM ExpressionsDelahochiennes ORDER BY LOWER(expression)"))
+        if(DB.getConnection() != null)
         {
-            while (result.next()) {
-                int ID;
-                String ExpressionTrans;
-                String Meaning;
-                String Picture;
-                
-                ID = result.getInt("id");
-                ExpressionTrans = result.getString("expression");
-                Meaning = result.getString("signification");
-                Picture = result.getString("illustration");
-                
-                res.add(new ExpressionDelahochienne(ID, ExpressionTrans, Meaning, Picture));
-                
+            if(!DB.getConnection().isClosed())
+            {
+                Statement statement = DB.getConnection().createStatement();
+
+                ArrayList<ExpressionDelahochienne> res = new ArrayList();
+
+                try (ResultSet result = statement.executeQuery("SELECT id, expression, signification, illustration FROM ExpressionsDelahochiennes ORDER BY LOWER(expression)"))
+                {
+                    while (result.next()) {
+                        int ID;
+                        String ExpressionTrans;
+                        String Meaning;
+                        String Picture;
+
+                        ID = result.getInt("id");
+                        ExpressionTrans = result.getString("expression");
+                        Meaning = result.getString("signification");
+                        Picture = result.getString("illustration");
+
+                        res.add(new ExpressionDelahochienne(ID, ExpressionTrans, Meaning, Picture));
+
+                    }
+                }
+                return res;
             }
         }
-        return res;
+        return null;
         
+    }
+    
+    public static void deleteAtIndex(int i) throws SQLException
+    {
+        if(DB.getConnection() != null)
+        {
+            if(!DB.getConnection().isClosed())
+            {
+                PreparedStatement statement = DB.getConnection().prepareStatement("DELETE FROM ExpressionsDelahochiennes WHERE id = ?");
+                statement.setInt(1, i);
+                statement.execute();
+            }
+        }
     }
 
     public int getId()

@@ -5,8 +5,15 @@
  */
 package com.asinfo.delarousse.views;
 
+import com.asinfo.delarousse.models.DB;
+import com.asinfo.delarousse.models.DBFileFilter;
 import com.asinfo.delarousse.models.ExpressionDelahochienne;
-import com.asinfo.delarousse.models.ListDataModel;
+import com.asinfo.delarousse.controllers.ListDataControl;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -19,6 +26,10 @@ public class Window extends javax.swing.JFrame {
      */
     public Window() {
         initComponents();
+        
+        openMenu = new JFileChooser("../DB");
+        openMenu.setFileFilter(new DBFileFilter());
+        openMenu.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -40,6 +51,7 @@ public class Window extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         expressionField = new javax.swing.JTextField();
         meaningField = new javax.swing.JTextField();
+        deleteButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         loadMenuItem = new javax.swing.JMenuItem();
@@ -47,7 +59,7 @@ public class Window extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Delarousse interactif");
 
-        entriesList.setModel(new ListDataModel());
+        entriesList.setModel(new ListDataControl());
         entriesList.addListSelectionListener(new javax.swing.event.ListSelectionListener()
         {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt)
@@ -61,10 +73,26 @@ public class Window extends javax.swing.JFrame {
 
         jLabel2.setText("Signification");
 
-        fileMenu.setText("File");
+        deleteButton.setText("Supprimer");
+        deleteButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                deleteButtonActionPerformed(evt);
+            }
+        });
+
+        fileMenu.setText("Fichier");
 
         loadMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         loadMenuItem.setText("Ouvrir");
+        loadMenuItem.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                loadMenuItemActionPerformed(evt);
+            }
+        });
         fileMenu.add(loadMenuItem);
 
         menuBar.add(fileMenu);
@@ -77,7 +105,9 @@ public class Window extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(deleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel2)
@@ -104,7 +134,9 @@ public class Window extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(meaningField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(deleteButton)
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         pack();
@@ -112,12 +144,50 @@ public class Window extends javax.swing.JFrame {
 
     private void entriesListValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_entriesListValueChanged
     {//GEN-HEADEREND:event_entriesListValueChanged
-        ExpressionDelahochienne exp = ((ListDataModel)entriesList.getModel()).getEntryAt(entriesList.getSelectedIndex());
-        expressionField.setText(exp.getExpression());
-        meaningField.setText(exp.getMeaning());
+        if(entriesList.getSelectedIndex() > 0)
+        {
+            ExpressionDelahochienne exp = ((ListDataControl)entriesList.getModel()).getEntryAt(entriesList.getSelectedIndex());
+            expressionField.setText(exp.getExpression());
+            meaningField.setText(exp.getMeaning());
+        }
     }//GEN-LAST:event_entriesListValueChanged
 
+    private void loadMenuItemActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_loadMenuItemActionPerformed
+    {//GEN-HEADEREND:event_loadMenuItemActionPerformed
+        int result = openMenu.showDialog(this, "Charger");
+        
+        if(result == JFileChooser.APPROVE_OPTION)
+        {
+            File file = openMenu.getSelectedFile();
+            if(DB.getConnection() != null) try {
+                if(!DB.getConnection().isClosed()) DB.closeConnection();
+            }
+            catch (SQLException ex) {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try
+            {
+                DB.createConnection(file.getAbsolutePath());
+                entriesList.setModel(new ListDataControl());
+                expressionField.setText("");
+                meaningField.setText("");
+            }
+            catch (ClassNotFoundException | SQLException ex)
+            {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_loadMenuItemActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_deleteButtonActionPerformed
+    {//GEN-HEADEREND:event_deleteButtonActionPerformed
+        ((ListDataControl)entriesList.getModel()).deleteEntryAt(entriesList.getSelectedIndex());
+        entriesList.repaint();
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private JFileChooser openMenu;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton deleteButton;
     private javax.swing.JList<String> entriesList;
     private javax.swing.JTextField expressionField;
     private javax.swing.JMenu fileMenu;

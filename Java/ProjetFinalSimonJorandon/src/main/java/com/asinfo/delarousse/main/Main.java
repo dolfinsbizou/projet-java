@@ -22,6 +22,7 @@ public class Main {
     
     public static void main (String[] args)
     {
+        /*
         try
         {
             DB.createConnection("/home/doug-rattmann/Documents/NetBeansProjects/delahaye/Java/DB/BaseDelahochienne.sqlite");
@@ -31,6 +32,7 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             exit(1);
         }
+        //*/
         
         Controller controller = new Controller();
     }
