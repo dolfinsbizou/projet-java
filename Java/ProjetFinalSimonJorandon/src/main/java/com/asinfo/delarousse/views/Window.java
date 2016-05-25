@@ -14,6 +14,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 
 /**
  *
@@ -30,6 +32,7 @@ public class Window extends javax.swing.JFrame {
         openMenu = new JFileChooser("../DB");
         openMenu.setFileFilter(new DBFileFilter());
         openMenu.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        entriesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -55,6 +58,7 @@ public class Window extends javax.swing.JFrame {
         meaningField = new javax.swing.JTextField();
         deleteButton = new javax.swing.JButton();
         modifyButton = new javax.swing.JButton();
+        addButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         loadMenuItem = new javax.swing.JMenuItem();
@@ -111,6 +115,15 @@ public class Window extends javax.swing.JFrame {
             }
         });
 
+        addButton.setText("Nouvelle entrée");
+        addButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                addButtonActionPerformed(evt);
+            }
+        });
+
         fileMenu.setText("Fichier");
 
         loadMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
@@ -149,6 +162,8 @@ public class Window extends javax.swing.JFrame {
                             .addComponent(meaningField, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(modifyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(addButton)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -171,7 +186,8 @@ public class Window extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deleteButton)
-                    .addComponent(modifyButton))
+                    .addComponent(modifyButton)
+                    .addComponent(addButton))
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 
@@ -182,13 +198,15 @@ public class Window extends javax.swing.JFrame {
     {//GEN-HEADEREND:event_entriesListValueChanged
         expressionLabel.setForeground(Color.black);
         meaningLabel.setForeground(Color.black);
-                
+        modifyButton.setText("Modifier");     
+        
         if(entriesList.getSelectedIndex() >= 0)
         {
             ExpressionDelahochienne exp = ((ListDataControl)entriesList.getModel()).getEntryAt(entriesList.getSelectedIndex());
             expressionField.setText(exp.getExpression());
             meaningField.setText(exp.getMeaning());
             modifyButton.setEnabled(true);
+            deleteButton.setEnabled(true);
             expressionField.setEnabled(true);
             meaningField.setEnabled(true);
             activeIndex = exp.getId();
@@ -197,8 +215,11 @@ public class Window extends javax.swing.JFrame {
         {
             modifyButton.setEnabled(false);  
             expressionField.setEnabled(false);
+            deleteButton.setEnabled(false);
             meaningField.setEnabled(false);
-            activeIndex = -2;
+            expressionField.setText("");
+            meaningField.setText("");
+            if(activeIndex!=-1) activeIndex = -2;
         }
     }//GEN-LAST:event_entriesListValueChanged
 
@@ -210,37 +231,81 @@ public class Window extends javax.swing.JFrame {
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_deleteButtonActionPerformed
     {//GEN-HEADEREND:event_deleteButtonActionPerformed
         ((ListDataControl)entriesList.getModel()).deleteEntryAt(entriesList.getSelectedIndex());
+        entriesList.clearSelection();
+        activeIndex = -2;
         entriesList.repaint();
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void modifyButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_modifyButtonActionPerformed
     {//GEN-HEADEREND:event_modifyButtonActionPerformed
-        ((ListDataControl)entriesList.getModel()).updateEntryAt(entriesList.getSelectedIndex(), expressionField.getText(), meaningField.getText());
-        expressionLabel.setForeground(Color.black);
-        meaningLabel.setForeground(Color.black);
-        entriesList.setSelectedIndex(((ListDataControl)entriesList.getModel()).getListIndexFromDBIndex(activeIndex));
-        entriesList.repaint();
+        if(activeIndex >= 0)
+        {
+            ((ListDataControl)entriesList.getModel()).updateEntryAt(entriesList.getSelectedIndex(), expressionField.getText(), meaningField.getText());
+            expressionLabel.setForeground(Color.black);
+            meaningLabel.setForeground(Color.black);
+            entriesList.setSelectedIndex(((ListDataControl)entriesList.getModel()).getListIndexFromDBIndex(activeIndex));
+            entriesList.repaint();
+        }
+        else if(activeIndex == -1)
+        {
+            String errString = "";
+            int hasErr = 0;
+            if(expressionField.getText().isEmpty())
+            {
+                hasErr++;
+                errString = "d'expression";
+            }
+            if(meaningField.getText().isEmpty())
+            {
+                hasErr++;
+                errString+= (!errString.isEmpty()?" et ":"") + "de signification";
+            }
+            
+            errString = "Merci de compléter " + (hasErr>1?"les champs ":"le champ ") + errString;
+            
+            if(hasErr == 0)
+            {
+                ((ListDataControl)entriesList.getModel()).addEntry(expressionField.getText(), meaningField.getText());
+                entriesList.setModel(new ListDataControl());
+                expressionField.setText("");
+                meaningField.setText("");
+                activeIndex = -2;
+                entriesList.repaint();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null, errString, "Certains champs sont incomplets !", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_modifyButtonActionPerformed
 
     private void expressionFieldKeyTyped(java.awt.event.KeyEvent evt)//GEN-FIRST:event_expressionFieldKeyTyped
     {//GEN-HEADEREND:event_expressionFieldKeyTyped
-        expressionLabel.setForeground(Color.red);
+        if(activeIndex != -1) expressionLabel.setForeground(Color.red);
     }//GEN-LAST:event_expressionFieldKeyTyped
 
     private void meaningFieldKeyTyped(java.awt.event.KeyEvent evt)//GEN-FIRST:event_meaningFieldKeyTyped
     {//GEN-HEADEREND:event_meaningFieldKeyTyped
-        meaningLabel.setForeground(Color.red);
+        if(activeIndex != -1) meaningLabel.setForeground(Color.red);
     }//GEN-LAST:event_meaningFieldKeyTyped
 
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_addButtonActionPerformed
+    {//GEN-HEADEREND:event_addButtonActionPerformed
+        activeIndex = -1; // -1 : mode d'ajout
+        entriesList.clearSelection();
+        modifyButton.setText("Ajouter");
+        modifyButton.setEnabled(true);
+        expressionField.setEnabled(true);
+        meaningField.setEnabled(true);
+        deleteButton.setEnabled(false);
+        expressionLabel.setForeground(Color.green);
+        meaningLabel.setForeground(Color.green);
+        expressionField.setText("");
+        meaningField.setText("");
+    }//GEN-LAST:event_addButtonActionPerformed
+
     private void manageDBLoading()
-    {
-        modifyButton.setEnabled(false);
-        expressionLabel.setForeground(Color.black);
-        meaningLabel.setForeground(Color.black);
-        meaningField.setEnabled(false);
-        expressionField.setEnabled(false);
-        activeIndex = -2;
-        
+    {   
         int result = openMenu.showDialog(this, "Charger");
         
         if(result == JFileChooser.APPROVE_OPTION)
@@ -256,6 +321,8 @@ public class Window extends javax.swing.JFrame {
             {
                 DB.createConnection(file.getAbsolutePath());
                 entriesList.setModel(new ListDataControl());
+                entriesList.clearSelection();
+                addButton.setEnabled(true);
                 expressionField.setText("");
                 meaningField.setText("");
             }
@@ -264,11 +331,24 @@ public class Window extends javax.swing.JFrame {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        else if(result == JFileChooser.CANCEL_OPTION && DB.getConnection() == null)
+        {
+            modifyButton.setEnabled(false);
+            addButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+            modifyButton.setText("Modifier");
+            expressionLabel.setForeground(Color.black);
+            meaningLabel.setForeground(Color.black);
+            meaningField.setEnabled(false);
+            expressionField.setEnabled(false);
+            activeIndex = -2; // -2 : aucune entrée sélectionnée
+        }
     }
     
     private JFileChooser openMenu;
     int activeIndex;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
     private javax.swing.JButton deleteButton;
     private javax.swing.JList<String> entriesList;
     private javax.swing.JTextField expressionField;

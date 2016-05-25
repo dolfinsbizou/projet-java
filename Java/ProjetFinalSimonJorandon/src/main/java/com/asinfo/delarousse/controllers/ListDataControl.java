@@ -87,4 +87,17 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
             Logger.getLogger(ListDataControl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void addEntry(String expression, String meaning)
+    {
+        try
+        {
+            ExpressionDelahochienne.add(expression, meaning);
+            entries = ExpressionDelahochienne.getList();
+        }
+        catch (SQLException ex)
+        {
+            Logger.getLogger(ListDataControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

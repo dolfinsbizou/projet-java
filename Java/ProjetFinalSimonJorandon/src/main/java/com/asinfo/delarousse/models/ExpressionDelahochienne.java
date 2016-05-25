@@ -100,15 +100,25 @@ public class ExpressionDelahochienne
             }
         }
     }
+    
+    public static void add(String expression, String meaning /*ADD BLOB*/) throws SQLException
+    {
+        if(DB.getConnection() != null)
+        {
+            if(!DB.getConnection().isClosed())
+            {
+                PreparedStatement statement = DB.getConnection().prepareStatement("INSERT INTO ExpressionsDelahochiennes(expression, signification) VALUES(?, ?)");
+                statement.setString(1, expression);
+                statement.setString(2, meaning);
+                
+                statement.execute();
+            }
+        }
+    }
 
     public int getId()
     {
         return id;
-    }
-
-    public void setId(int id)
-    {
-        this.id = id;
     }
 
     public String getExpression()
@@ -116,29 +126,14 @@ public class ExpressionDelahochienne
         return expression;
     }
 
-    public void setExpression(String expression)
-    {
-        this.expression = expression;
-    }
-
     public String getMeaning()
     {
         return meaning;
     }
 
-    public void setMeaning(String meaning)
-    {
-        this.meaning = meaning;
-    }
-
     public String getPicture()
     {
         return picture;
-    }
-
-    public void setPicture(String picture)
-    {
-        this.picture = picture;
     }
 
     @Override
