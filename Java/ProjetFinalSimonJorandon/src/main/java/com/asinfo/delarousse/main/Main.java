@@ -6,11 +6,6 @@
 package com.asinfo.delarousse.main;
 
 import com.asinfo.delarousse.controllers.Controller;
-import com.asinfo.delarousse.models.DB;
-import static java.lang.System.exit;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

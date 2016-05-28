@@ -12,7 +12,7 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author doug-rattmann
  */
-public class DBFileFilter extends FileFilter
+public class ImageFileFilter extends FileFilter
 {
 
     @Override
@@ -29,13 +29,27 @@ public class DBFileFilter extends FileFilter
             ext = s.substring(i+1).toLowerCase();
         }   
         
-        return "sqlite".equals(ext);
+        if(ext!=null)
+            switch(ext)
+            {
+                case "jpeg":
+                case "jpg":
+                case "png":
+                case "tiff":
+                case "tif":
+                case "gif":
+                    return true;
+                default:
+                    return false;
+            }
+        else
+            return false;
     }
 
     @Override
     public String getDescription()
     {
-        return "Fichiers de base de données SQLite (.sqlite)";
+        return "Fichiers image (.png, .jp(e)g, .tif(f), .gif)";
     }
     
 }

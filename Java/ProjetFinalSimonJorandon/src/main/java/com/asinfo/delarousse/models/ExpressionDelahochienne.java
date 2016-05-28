@@ -5,6 +5,7 @@
  */
 package com.asinfo.delarousse.models;
 
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,14 +22,12 @@ public class ExpressionDelahochienne
     int id;
     String expression;
     String meaning;
-    String picture;
-
-    public ExpressionDelahochienne(int ID, String Expression, String Meaning, String Picture)
+    
+    public ExpressionDelahochienne(int ID, String Expression, String Meaning)
     {
         id = ID;
         expression = Expression;
         meaning = Meaning;
-        picture = Picture;
     }
 
     /**
@@ -46,20 +45,19 @@ public class ExpressionDelahochienne
 
                 ArrayList<ExpressionDelahochienne> res = new ArrayList();
 
-                try (ResultSet result = statement.executeQuery("SELECT id, expression, signification, illustration FROM ExpressionsDelahochiennes ORDER BY LOWER(expression)"))
+                try (ResultSet result = statement.executeQuery("SELECT id, expression, signification FROM ExpressionsDelahochiennes ORDER BY LOWER(expression)"))
                 {
-                    while (result.next()) {
+                    while (result.next())
+                    {
                         int ID;
                         String ExpressionTrans;
                         String Meaning;
-                        String Picture;
 
                         ID = result.getInt("id");
                         ExpressionTrans = result.getString("expression");
                         Meaning = result.getString("signification");
-                        Picture = result.getString("illustration");
 
-                        res.add(new ExpressionDelahochienne(ID, ExpressionTrans, Meaning, Picture));
+                        res.add(new ExpressionDelahochienne(ID, ExpressionTrans, Meaning));
 
                     }
                 }
@@ -67,7 +65,6 @@ public class ExpressionDelahochienne
             }
         }
         return null;
-        
     }
     
     public static void deleteAtIndex(int i) throws SQLException
@@ -85,31 +82,33 @@ public class ExpressionDelahochienne
         }
     }
     
-    public static void updateAtIndex(int index, String expression, String meaning /*ADD BLOB*/) throws SQLException
+    public static void updateAtIndex(int index, String expression, String meaning, Blob illustration) throws SQLException
     {
         if(DB.getConnection() != null)
         {
             if(!DB.getConnection().isClosed())
             {
-                PreparedStatement statement = DB.getConnection().prepareStatement("UPDATE ExpressionsDelahochiennes SET expression = ?, signification = ? WHERE id = ?");
+                PreparedStatement statement = DB.getConnection().prepareStatement("UPDATE ExpressionsDelahochiennes SET expression = ?, signification = ?, illustration = ? WHERE id = ?");
                 statement.setString(1, expression);
                 statement.setString(2, meaning);
-                statement.setInt(3, index);
+                statement.setInt(4, index);
+                statement.setBlob(3, illustration);
                 
                 statement.execute();
             }
         }
     }
     
-    public static void add(String expression, String meaning /*ADD BLOB*/) throws SQLException
+    public static void add(String expression, String meaning, byte[] illustration) throws SQLException
     {
         if(DB.getConnection() != null)
         {
             if(!DB.getConnection().isClosed())
             {
-                PreparedStatement statement = DB.getConnection().prepareStatement("INSERT INTO ExpressionsDelahochiennes(expression, signification) VALUES(?, ?)");
+                PreparedStatement statement = DB.getConnection().prepareStatement("INSERT INTO ExpressionsDelahochiennes(expression, signification, illustration) VALUES(?, ?, ?)");
                 statement.setString(1, expression);
                 statement.setString(2, meaning);
+                statement.setBytes(3, illustration);
                 
                 statement.execute();
             }
@@ -130,16 +129,40 @@ public class ExpressionDelahochienne
     {
         return meaning;
     }
-
-    public String getPicture()
+    
+    public static byte[] retrieveIllustration(int index) throws SQLException
     {
-        return picture;
+        if(DB.getConnection() != null)
+        {
+            if(!DB.getConnection().isClosed())
+            {
+                PreparedStatement statement = DB.getConnection().prepareStatement("SELECT illustration FROM ExpressionsDelahochiennes WHERE id = ?");
+                
+                statement.setInt(1, index);
+                
+                byte[] res = null;
+
+                try (ResultSet result = statement.executeQuery())
+                {
+                    if (result.next())
+                    {
+                        int ID;
+                        String ExpressionTrans;
+                        String Meaning;
+
+                        res = result.getBytes("illustration");
+                    }
+                }
+                return res;
+            }
+        }
+        return null;
     }
 
     @Override
     public String toString()
     {
-        return "ExpressionDelahochienne{" + "id=" + id + ", expression=" + expression + ", meanning=" + meaning + ", picture=" + picture + '}';
+        return "ExpressionDelahochienne{" + "id=" + id + ", expression=" + expression + ", meanning=" + meaning + '}';
     }
 
     

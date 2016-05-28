@@ -6,10 +6,11 @@
 package com.asinfo.delarousse.controllers;
 
 import com.asinfo.delarousse.models.ExpressionDelahochienne;
+import com.asinfo.delarousse.models.ImageBlobManager;
 import com.asinfo.delarousse.views.Window;
+import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,11 +76,11 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         }
     }
     
-    public void updateEntryAt(int i, String expression, String meaning)
+    public void updateEntryAt(int i, String expression, String meaning, BufferedImage illustration)
     {
         try
         {
-            ExpressionDelahochienne.updateAtIndex(entries.get(i).getId(), expression, meaning);
+            ExpressionDelahochienne.updateAtIndex(entries.get(i).getId(), expression, meaning, illustration);
             entries = ExpressionDelahochienne.getList();
         }
         catch (SQLException ex)
@@ -88,16 +89,29 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         }
     }
     
-    public void addEntry(String expression, String meaning)
+    public void addEntry(String expression, String meaning, BufferedImage illustration, String extension)
     {
         try
         {
-            ExpressionDelahochienne.add(expression, meaning);
+            ExpressionDelahochienne.add(expression, meaning, ImageBlobManager.createBlob(illustration, extension));
             entries = ExpressionDelahochienne.getList();
         }
         catch (SQLException ex)
         {
             Logger.getLogger(ListDataControl.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public byte[] retrieveIllustration(int index)
+    {
+        try
+        {
+            return entries!=null?ExpressionDelahochienne.retrieveIllustration(entries.get(index).getId()):null;
+        }
+        catch (SQLException ex)
+        {
+            Logger.getLogger(ListDataControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }

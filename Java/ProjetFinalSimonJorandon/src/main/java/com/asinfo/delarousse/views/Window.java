@@ -9,10 +9,13 @@ import com.asinfo.delarousse.models.DB;
 import com.asinfo.delarousse.models.ExpressionDelahochienne;
 import com.asinfo.delarousse.controllers.ListDataControl;
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
@@ -32,8 +35,14 @@ public class Window extends javax.swing.JFrame {
         openMenu = new JFileChooser("../DB");
         openMenu.setFileFilter(new DBFileFilter());
         openMenu.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        openMenu.setMultiSelectionEnabled(false);
+        imageMenu = new JFileChooser();
+        imageMenu.setFileFilter(new ImageFileFilter());
+        imageMenu.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        imageMenu.setMultiSelectionEnabled(false);
+        imageMenu.setAcceptAllFileFilterUsed(false);
         entriesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+                
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         
@@ -59,6 +68,9 @@ public class Window extends javax.swing.JFrame {
         deleteButton = new javax.swing.JButton();
         modifyButton = new javax.swing.JButton();
         addButton = new javax.swing.JButton();
+        imagePathField = new javax.swing.JLabel();
+        loadImageButton = new javax.swing.JButton();
+        imagePanel = (ImagePanel) new ImagePanel(null);
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         loadMenuItem = new javax.swing.JMenuItem();
@@ -124,6 +136,29 @@ public class Window extends javax.swing.JFrame {
             }
         });
 
+        imagePathField.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        imagePathField.setText("jLabel1");
+
+        loadImageButton.setText("Image...");
+        loadImageButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                loadImageButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout imagePanelLayout = new javax.swing.GroupLayout(imagePanel);
+        imagePanel.setLayout(imagePanelLayout);
+        imagePanelLayout.setHorizontalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        imagePanelLayout.setVerticalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
         fileMenu.setText("Fichier");
 
         loadMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
@@ -159,18 +194,23 @@ public class Window extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(expressionField)
-                            .addComponent(meaningField, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)))
+                            .addComponent(meaningField)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(modifyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(addButton)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(modifyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(addButton))
+                            .addComponent(imagePathField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(loadImageButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -182,7 +222,13 @@ public class Window extends javax.swing.JFrame {
                         .addGap(34, 34, 34)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(meaningLabel)
-                            .addComponent(meaningField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(meaningField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(imagePathField)
+                            .addComponent(loadImageButton))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deleteButton)
@@ -207,8 +253,21 @@ public class Window extends javax.swing.JFrame {
             meaningField.setText(exp.getMeaning());
             modifyButton.setEnabled(true);
             deleteButton.setEnabled(true);
+            /*
+            try
+            {
+                ((ImagePanel)imagePanel).setImg(ImageIO.read(new ByteArrayInputStream(((ListDataControl)entriesList.getModel()).retrieveIllustration(entriesList.getSelectedIndex()))), ""); //Pas bon, on ne sait pas quel type d'image charger
+            }
+            catch (IOException | NullPointerException ex)
+            {
+                ((ImagePanel)imagePanel).setImg(null, "");
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            ((ImagePanel)imagePanel).repaint();//*/
             expressionField.setEnabled(true);
             meaningField.setEnabled(true);
+            imagePathField.setText("(blob)");
+            loadImageButton.setEnabled(true);
             activeIndex = exp.getId();
         }
         if(entriesList.getSelectedIndex() == -1)
@@ -219,6 +278,19 @@ public class Window extends javax.swing.JFrame {
             meaningField.setEnabled(false);
             expressionField.setText("");
             meaningField.setText("");
+            if(activeIndex!=-1)
+            {
+                imagePathField.setText("(aucune sélection faite)");
+                loadImageButton.setEnabled(false);
+
+            }
+            else
+            {
+                imagePathField.setText("(aucun fichier spécifié)");
+                loadImageButton.setEnabled(true);
+            }
+            ((ImagePanel)imagePanel).setImg(null, "");
+            ((ImagePanel)imagePanel).repaint();
             if(activeIndex!=-1) activeIndex = -2;
         }
     }//GEN-LAST:event_entriesListValueChanged
@@ -233,49 +305,59 @@ public class Window extends javax.swing.JFrame {
         ((ListDataControl)entriesList.getModel()).deleteEntryAt(entriesList.getSelectedIndex());
         entriesList.clearSelection();
         activeIndex = -2;
+        ((ImagePanel)imagePanel).setImg(null, "");
+        ((ImagePanel)imagePanel).repaint();
         entriesList.repaint();
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void modifyButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_modifyButtonActionPerformed
     {//GEN-HEADEREND:event_modifyButtonActionPerformed
-        if(activeIndex >= 0)
+        String errString = "";
+        int hasErr = 0;
+        if(expressionField.getText().isEmpty())
         {
-            ((ListDataControl)entriesList.getModel()).updateEntryAt(entriesList.getSelectedIndex(), expressionField.getText(), meaningField.getText());
-            expressionLabel.setForeground(Color.black);
-            meaningLabel.setForeground(Color.black);
-            entriesList.setSelectedIndex(((ListDataControl)entriesList.getModel()).getListIndexFromDBIndex(activeIndex));
-            entriesList.repaint();
+            hasErr++;
+            errString = "d'expression";
         }
-        else if(activeIndex == -1)
+        if(meaningField.getText().isEmpty())
         {
-            String errString = "";
-            int hasErr = 0;
-            if(expressionField.getText().isEmpty())
+            hasErr++;
+            errString+= (!errString.isEmpty()?" et ":"") + "de signification";
+        }
+        if(!((ImagePanel)imagePanel).isImgSet())
+        {
+            hasErr++;
+            errString+= (!errString.isEmpty()?" et ":"") + "d'illustration";
+            System.out.println("ldzfzk");
+        }
+
+        errString = "Merci de compléter " + (hasErr>1?"les champs ":"le champ ") + errString;
+        
+        if(hasErr == 0)
+        {
+            if(activeIndex >= 0)
             {
-                hasErr++;
-                errString = "d'expression";
+                ((ListDataControl)entriesList.getModel()).updateEntryAt(entriesList.getSelectedIndex(), expressionField.getText(), meaningField.getText(), ((ImagePanel)imagePanel).getImg());
+                expressionLabel.setForeground(Color.black);
+                meaningLabel.setForeground(Color.black);
+                entriesList.setSelectedIndex(((ListDataControl)entriesList.getModel()).getListIndexFromDBIndex(activeIndex));
+                entriesList.repaint();
             }
-            if(meaningField.getText().isEmpty())
+            else if(activeIndex == -1)
             {
-                hasErr++;
-                errString+= (!errString.isEmpty()?" et ":"") + "de signification";
-            }
-            
-            errString = "Merci de compléter " + (hasErr>1?"les champs ":"le champ ") + errString;
-            
-            if(hasErr == 0)
-            {
-                ((ListDataControl)entriesList.getModel()).addEntry(expressionField.getText(), meaningField.getText());
+                ((ListDataControl)entriesList.getModel()).addEntry(expressionField.getText(), meaningField.getText(), ((ImagePanel)imagePanel).getImg(), ((ImagePanel)imagePanel).getExtension());
                 entriesList.setModel(new ListDataControl());
                 expressionField.setText("");
+                ((ImagePanel)imagePanel).setImg(null, "");
+                ((ImagePanel)imagePanel).repaint();
                 meaningField.setText("");
                 activeIndex = -2;
                 entriesList.repaint();
             }
-            else
-            {
-                JOptionPane.showMessageDialog(null, errString, "Certains champs sont incomplets !", JOptionPane.ERROR_MESSAGE);
-            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null, errString, "Certains champs sont incomplets !", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_modifyButtonActionPerformed
 
@@ -294,15 +376,47 @@ public class Window extends javax.swing.JFrame {
         activeIndex = -1; // -1 : mode d'ajout
         entriesList.clearSelection();
         modifyButton.setText("Ajouter");
+        imagePathField.setText("(aucun fichier spécifié)");
+        ((ImagePanel)imagePanel).setImg(null, "");
+        ((ImagePanel)imagePanel).repaint();
         modifyButton.setEnabled(true);
         expressionField.setEnabled(true);
         meaningField.setEnabled(true);
+        loadImageButton.setEnabled(true);
         deleteButton.setEnabled(false);
         expressionLabel.setForeground(Color.green);
         meaningLabel.setForeground(Color.green);
         expressionField.setText("");
         meaningField.setText("");
     }//GEN-LAST:event_addButtonActionPerformed
+
+    private void loadImageButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_loadImageButtonActionPerformed
+    {//GEN-HEADEREND:event_loadImageButtonActionPerformed
+        int result = imageMenu.showDialog(this, "Ouvrir");
+        
+        if(result == JFileChooser.APPROVE_OPTION)
+        {
+            try
+            {
+                File file = imageMenu.getSelectedFile();
+                
+                String ext = null;
+                String s = file.getName();
+                int i = s.lastIndexOf('.');
+                if(i > 0 && i < s.length())
+                {
+                    ext = s.substring(i+1).toLowerCase();
+                }
+                
+                ((ImagePanel)imagePanel).setImg(ImageIO.read(file), ext);
+                imagePanel.repaint();
+            }
+            catch (IOException ex)
+            {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_loadImageButtonActionPerformed
 
     private void manageDBLoading()
     {   
@@ -325,6 +439,12 @@ public class Window extends javax.swing.JFrame {
                 addButton.setEnabled(true);
                 expressionField.setText("");
                 meaningField.setText("");
+                meaningField.setEnabled(false);
+                ((ImagePanel)imagePanel).setImg(null, "");
+                ((ImagePanel)imagePanel).repaint();
+                expressionField.setEnabled(false);
+                imagePathField.setText("(aucune sélection faite)");
+                loadImageButton.setEnabled(false);
             }
             catch (ClassNotFoundException | SQLException ex)
             {
@@ -340,12 +460,14 @@ public class Window extends javax.swing.JFrame {
             expressionLabel.setForeground(Color.black);
             meaningLabel.setForeground(Color.black);
             meaningField.setEnabled(false);
+            loadImageButton.setEnabled(false);
             expressionField.setEnabled(false);
+            imagePathField.setText("");
             activeIndex = -2; // -2 : aucune entrée sélectionnée
         }
     }
     
-    private JFileChooser openMenu;
+    private final JFileChooser openMenu, imageMenu;
     int activeIndex;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
@@ -354,7 +476,10 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextField expressionField;
     private javax.swing.JLabel expressionLabel;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JPanel imagePanel;
+    private javax.swing.JLabel imagePathField;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton loadImageButton;
     private javax.swing.JMenuItem loadMenuItem;
     private javax.swing.JTextField meaningField;
     private javax.swing.JLabel meaningLabel;
