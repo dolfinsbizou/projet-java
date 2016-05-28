@@ -22,12 +22,14 @@ public class ExpressionDelahochienne
     int id;
     String expression;
     String meaning;
+    String extension;
     
-    public ExpressionDelahochienne(int ID, String Expression, String Meaning)
+    public ExpressionDelahochienne(int id, String expression, String meaning, String extension)
     {
-        id = ID;
-        expression = Expression;
-        meaning = Meaning;
+        this.id = id;
+        this.expression = expression;
+        this.meaning = meaning;
+        this.extension = extension;
     }
 
     /**
@@ -45,19 +47,21 @@ public class ExpressionDelahochienne
 
                 ArrayList<ExpressionDelahochienne> res = new ArrayList();
 
-                try (ResultSet result = statement.executeQuery("SELECT id, expression, signification FROM ExpressionsDelahochiennes ORDER BY LOWER(expression)"))
+                try (ResultSet result = statement.executeQuery("SELECT id, expression, signification, extension FROM ExpressionsDelahochiennes ORDER BY LOWER(expression)"))
                 {
                     while (result.next())
                     {
-                        int ID;
-                        String ExpressionTrans;
-                        String Meaning;
+                        int id;
+                        String expressionTrans;
+                        String meaning;
+                        String extension;
 
-                        ID = result.getInt("id");
-                        ExpressionTrans = result.getString("expression");
-                        Meaning = result.getString("signification");
+                        id = result.getInt("id");
+                        expressionTrans = result.getString("expression");
+                        meaning = result.getString("signification");
+                        extension = result.getString("extension");
 
-                        res.add(new ExpressionDelahochienne(ID, ExpressionTrans, Meaning));
+                        res.add(new ExpressionDelahochienne(id, expressionTrans, meaning, extension));
 
                     }
                 }
@@ -82,33 +86,35 @@ public class ExpressionDelahochienne
         }
     }
     
-    public static void updateAtIndex(int index, String expression, String meaning, Blob illustration) throws SQLException
+    public static void updateAtIndex(int index, String expression, String meaning, byte[] illustration, String extension) throws SQLException
     {
         if(DB.getConnection() != null)
         {
             if(!DB.getConnection().isClosed())
             {
-                PreparedStatement statement = DB.getConnection().prepareStatement("UPDATE ExpressionsDelahochiennes SET expression = ?, signification = ?, illustration = ? WHERE id = ?");
+                PreparedStatement statement = DB.getConnection().prepareStatement("UPDATE ExpressionsDelahochiennes SET expression = ?, signification = ?, illustration = ?, extension = ? WHERE id = ?");
                 statement.setString(1, expression);
                 statement.setString(2, meaning);
-                statement.setInt(4, index);
-                statement.setBlob(3, illustration);
+                statement.setInt(5, index);
+                statement.setBytes(3, illustration);
+                statement.setString(4, extension);
                 
                 statement.execute();
             }
         }
     }
     
-    public static void add(String expression, String meaning, byte[] illustration) throws SQLException
+    public static void add(String expression, String meaning, byte[] illustration, String extension) throws SQLException
     {
         if(DB.getConnection() != null)
         {
             if(!DB.getConnection().isClosed())
             {
-                PreparedStatement statement = DB.getConnection().prepareStatement("INSERT INTO ExpressionsDelahochiennes(expression, signification, illustration) VALUES(?, ?, ?)");
+                PreparedStatement statement = DB.getConnection().prepareStatement("INSERT INTO ExpressionsDelahochiennes(expression, signification, illustration, extension) VALUES(?, ?, ?, ?)");
                 statement.setString(1, expression);
                 statement.setString(2, meaning);
                 statement.setBytes(3, illustration);
+                statement.setString(4, extension);
                 
                 statement.execute();
             }
@@ -128,6 +134,11 @@ public class ExpressionDelahochienne
     public String getMeaning()
     {
         return meaning;
+    }
+    
+    public String getExtension()
+    {
+        return extension;
     }
     
     public static byte[] retrieveIllustration(int index) throws SQLException

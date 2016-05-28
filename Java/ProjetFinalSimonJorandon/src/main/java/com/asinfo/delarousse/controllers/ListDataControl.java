@@ -76,11 +76,11 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         }
     }
     
-    public void updateEntryAt(int i, String expression, String meaning, BufferedImage illustration)
+    public void updateEntryAt(int i, String expression, String meaning, BufferedImage illustration, String extension)
     {
         try
         {
-            ExpressionDelahochienne.updateAtIndex(entries.get(i).getId(), expression, meaning, illustration);
+            ExpressionDelahochienne.updateAtIndex(entries.get(i).getId(), expression, meaning, ImageBlobManager.createBlob(illustration, extension), extension);
             entries = ExpressionDelahochienne.getList();
         }
         catch (SQLException ex)
@@ -93,7 +93,7 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
     {
         try
         {
-            ExpressionDelahochienne.add(expression, meaning, ImageBlobManager.createBlob(illustration, extension));
+            ExpressionDelahochienne.add(expression, meaning, ImageBlobManager.createBlob(illustration, extension), extension);
             entries = ExpressionDelahochienne.getList();
         }
         catch (SQLException ex)

@@ -8,8 +8,9 @@ package com.asinfo.delarousse.views;
 import com.asinfo.delarousse.models.DB;
 import com.asinfo.delarousse.models.ExpressionDelahochienne;
 import com.asinfo.delarousse.controllers.ListDataControl;
+import com.asinfo.delarousse.models.ImageBlobManager;
 import java.awt.Color;
-import java.io.ByteArrayInputStream;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -74,6 +75,7 @@ public class Window extends javax.swing.JFrame {
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         loadMenuItem = new javax.swing.JMenuItem();
+        quitMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Delarousse interactif");
@@ -172,6 +174,17 @@ public class Window extends javax.swing.JFrame {
         });
         fileMenu.add(loadMenuItem);
 
+        quitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK));
+        quitMenuItem.setText("Quitter");
+        quitMenuItem.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                quitMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(quitMenuItem);
+
         menuBar.add(fileMenu);
 
         setJMenuBar(menuBar);
@@ -253,20 +266,24 @@ public class Window extends javax.swing.JFrame {
             meaningField.setText(exp.getMeaning());
             modifyButton.setEnabled(true);
             deleteButton.setEnabled(true);
-            /*
+            imagePathField.setText("(blob)");
+            BufferedImage tmp;
             try
             {
-                ((ImagePanel)imagePanel).setImg(ImageIO.read(new ByteArrayInputStream(((ListDataControl)entriesList.getModel()).retrieveIllustration(entriesList.getSelectedIndex()))), ""); //Pas bon, on ne sait pas quel type d'image charger
+                tmp = ImageBlobManager.createImage(ExpressionDelahochienne.retrieveIllustration(exp.getId()));
+                ((ImagePanel)imagePanel).setImg(tmp, exp.getExtension());
+                if(tmp == null)
+                {
+                    imagePathField.setText("(aucune image)");
+                }
             }
-            catch (IOException | NullPointerException ex)
+            catch (SQLException ex)
             {
-                ((ImagePanel)imagePanel).setImg(null, "");
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
-            ((ImagePanel)imagePanel).repaint();//*/
+            ((ImagePanel)imagePanel).repaint();
             expressionField.setEnabled(true);
             meaningField.setEnabled(true);
-            imagePathField.setText("(blob)");
             loadImageButton.setEnabled(true);
             activeIndex = exp.getId();
         }
@@ -337,7 +354,7 @@ public class Window extends javax.swing.JFrame {
         {
             if(activeIndex >= 0)
             {
-                ((ListDataControl)entriesList.getModel()).updateEntryAt(entriesList.getSelectedIndex(), expressionField.getText(), meaningField.getText(), ((ImagePanel)imagePanel).getImg());
+                ((ListDataControl)entriesList.getModel()).updateEntryAt(entriesList.getSelectedIndex(), expressionField.getText(), meaningField.getText(), ((ImagePanel)imagePanel).getImg(), ((ImagePanel)imagePanel).getExtension());
                 expressionLabel.setForeground(Color.black);
                 meaningLabel.setForeground(Color.black);
                 entriesList.setSelectedIndex(((ListDataControl)entriesList.getModel()).getListIndexFromDBIndex(activeIndex));
@@ -410,6 +427,7 @@ public class Window extends javax.swing.JFrame {
                 
                 ((ImagePanel)imagePanel).setImg(ImageIO.read(file), ext);
                 imagePanel.repaint();
+                imagePathField.setText(file.getName());
             }
             catch (IOException ex)
             {
@@ -417,6 +435,11 @@ public class Window extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_loadImageButtonActionPerformed
+
+    private void quitMenuItemActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_quitMenuItemActionPerformed
+    {//GEN-HEADEREND:event_quitMenuItemActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_quitMenuItemActionPerformed
 
     private void manageDBLoading()
     {   
@@ -485,5 +508,6 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel meaningLabel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JButton modifyButton;
+    private javax.swing.JMenuItem quitMenuItem;
     // End of variables declaration//GEN-END:variables
 }
