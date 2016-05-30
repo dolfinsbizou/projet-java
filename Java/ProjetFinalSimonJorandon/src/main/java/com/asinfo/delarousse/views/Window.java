@@ -216,17 +216,14 @@ public class Window extends javax.swing.JFrame {
                                 .addComponent(addButton))
                             .addComponent(imagePathField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(loadImageButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(loadImageButton, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE))
                     .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -241,13 +238,16 @@ public class Window extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(imagePathField)
-                            .addComponent(loadImageButton))))
+                            .addComponent(loadImageButton)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deleteButton)
                     .addComponent(modifyButton)
                     .addComponent(addButton))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -357,6 +357,7 @@ public class Window extends javax.swing.JFrame {
                 ((ListDataControl)entriesList.getModel()).updateEntryAt(entriesList.getSelectedIndex(), expressionField.getText(), meaningField.getText(), ((ImagePanel)imagePanel).getImg(), ((ImagePanel)imagePanel).getExtension());
                 expressionLabel.setForeground(Color.black);
                 meaningLabel.setForeground(Color.black);
+                imagePathField.setText("(blob)");
                 entriesList.setSelectedIndex(((ListDataControl)entriesList.getModel()).getListIndexFromDBIndex(activeIndex));
                 entriesList.repaint();
             }
@@ -367,6 +368,7 @@ public class Window extends javax.swing.JFrame {
                 expressionField.setText("");
                 ((ImagePanel)imagePanel).setImg(null, "");
                 ((ImagePanel)imagePanel).repaint();
+                imagePathField.setText("(blob)");
                 meaningField.setText("");
                 activeIndex = -2;
                 entriesList.repaint();
