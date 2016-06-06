@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 JORANDON Guillaume, SIMON Clément
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.asinfo.delarousse.views;
 
@@ -9,6 +20,8 @@ import com.asinfo.delarousse.models.DB;
 import com.asinfo.delarousse.models.ExpressionDelahochienne;
 import com.asinfo.delarousse.controllers.ListDataControl;
 import com.asinfo.delarousse.models.ImageBlobManager;
+import com.asinfo.delarousse.views.FileFilters.DBFileFilter;
+import com.asinfo.delarousse.views.FileFilters.ImageFileFilter;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,13 +35,13 @@ import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
 /**
- *
+ * Fenêtre principale de l'application
  * @author Clément
  */
 public class Window extends javax.swing.JFrame {
 
     /**
-     * Creates new form Window
+     * Crée la fenêtre avec ses paramètres initiaux
      */
     public Window() {
         initComponents();
@@ -253,6 +266,10 @@ public class Window extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Activé quand on clique sur un élément de la liste
+     * @param evt évènement activant
+     */
     private void entriesListValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_entriesListValueChanged
     {//GEN-HEADEREND:event_entriesListValueChanged
         expressionLabel.setForeground(Color.black);
@@ -312,11 +329,19 @@ public class Window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_entriesListValueChanged
 
+    /**
+     * activé quand on clique sur l'élément de menu Ouvrir
+     * @param evt évènement appelant
+     */
     private void loadMenuItemActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_loadMenuItemActionPerformed
     {//GEN-HEADEREND:event_loadMenuItemActionPerformed
         manageDBLoading();
     }//GEN-LAST:event_loadMenuItemActionPerformed
 
+    /**
+     * activé quand on clique sur le bouton de suppression
+     * @param evt évènement appelant
+     */
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_deleteButtonActionPerformed
     {//GEN-HEADEREND:event_deleteButtonActionPerformed
         ((ListDataControl)entriesList.getModel()).deleteEntryAt(entriesList.getSelectedIndex());
@@ -327,6 +352,10 @@ public class Window extends javax.swing.JFrame {
         entriesList.repaint();
     }//GEN-LAST:event_deleteButtonActionPerformed
 
+    /**
+     * activé quand on clique sur le bouton Ajouter/Modifier
+     * @param evt évènement appelant
+     */
     private void modifyButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_modifyButtonActionPerformed
     {//GEN-HEADEREND:event_modifyButtonActionPerformed
         String errString = "";
@@ -380,16 +409,28 @@ public class Window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_modifyButtonActionPerformed
 
+    /**
+     * activé quand on tape du texte dans le champ d'expression
+     * @param evt évènement appelant
+     */
     private void expressionFieldKeyTyped(java.awt.event.KeyEvent evt)//GEN-FIRST:event_expressionFieldKeyTyped
     {//GEN-HEADEREND:event_expressionFieldKeyTyped
         if(activeIndex != -1) expressionLabel.setForeground(Color.red);
     }//GEN-LAST:event_expressionFieldKeyTyped
 
+    /**
+     * activé quand on tape du texte dans le champ de signification
+     * @param evt évènement appelant
+     */
     private void meaningFieldKeyTyped(java.awt.event.KeyEvent evt)//GEN-FIRST:event_meaningFieldKeyTyped
     {//GEN-HEADEREND:event_meaningFieldKeyTyped
         if(activeIndex != -1) meaningLabel.setForeground(Color.red);
     }//GEN-LAST:event_meaningFieldKeyTyped
 
+    /**
+     * activé quand on clique sur le bouton de nouvelle entrée
+     * @param evt évènement appelant
+     */
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_addButtonActionPerformed
     {//GEN-HEADEREND:event_addButtonActionPerformed
         activeIndex = -1; // -1 : mode d'ajout
@@ -409,6 +450,10 @@ public class Window extends javax.swing.JFrame {
         meaningField.setText("");
     }//GEN-LAST:event_addButtonActionPerformed
 
+    /**
+     * activé quand on clique sur le bouton de sélection d'image
+     * @param evt évènement appelant
+     */
     private void loadImageButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_loadImageButtonActionPerformed
     {//GEN-HEADEREND:event_loadImageButtonActionPerformed
         int result = imageMenu.showDialog(this, "Ouvrir");
@@ -438,11 +483,18 @@ public class Window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_loadImageButtonActionPerformed
 
+    /**
+     * appelé quand on active l'élément de menu Quitter
+     * @param evt évènement appelant
+     */
     private void quitMenuItemActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_quitMenuItemActionPerformed
     {//GEN-HEADEREND:event_quitMenuItemActionPerformed
         System.exit(0);
     }//GEN-LAST:event_quitMenuItemActionPerformed
 
+    /**
+     * ouvre l'interface de chargement de BDD
+     */
     private void manageDBLoading()
     {   
         int result = openMenu.showDialog(this, "Charger");

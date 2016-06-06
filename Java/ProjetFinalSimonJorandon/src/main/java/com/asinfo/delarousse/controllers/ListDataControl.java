@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 JORANDON Guillaume, SIMON Clément
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.asinfo.delarousse.controllers;
 
@@ -15,13 +26,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Stocke les données de la JList
  * @author doug-rattmann
  */
 public class ListDataControl extends javax.swing.AbstractListModel<String>
 {
     private ArrayList<ExpressionDelahochienne> entries;
 
+    /**
+     * Récupère toutes les entrées de la BDD
+     */
     public ListDataControl()
     {
         try
@@ -46,11 +60,21 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         return entries!=null?entries.get(i).getExpression():"";
     }
     
+    /**
+     * Récupère l'entrée sélectionnée
+     * @param i indice de l'entrée
+     * @return l'objet ExpressionDelahochienne correspondant
+     */
     public ExpressionDelahochienne getEntryAt(int i)
     {
         return entries!=null?entries.get(i):null;
     }
     
+    /**
+     * Conversion de l'indice de liste->indice en BDD
+     * @param i l'indice de liste
+     * @return l'id en BDD correspondant
+     */
     public int getListIndexFromDBIndex(int i)
     {
         int r = 0;
@@ -63,6 +87,10 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         return -1;
     }
     
+    /**
+     * Supprime une entrée
+     * @param i indice de l'entrée à supprimer
+     */
     public void deleteEntryAt(int i)
     {
         try
@@ -76,6 +104,14 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         }
     }
     
+    /**
+     * met à jour une entrée
+     * @param i indice de l'entrée
+     * @param expression nouvelle valeur de l'expression
+     * @param meaning nouvelle valeur de la signification
+     * @param illustration nouvelle illustration
+     * @param extension nouvelle extension
+     */
     public void updateEntryAt(int i, String expression, String meaning, BufferedImage illustration, String extension)
     {
         try
@@ -89,6 +125,13 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         }
     }
     
+    /**
+     * ajoute une entrée
+     * @param expression valeur de l'expression
+     * @param meaning valeur de la signification
+     * @param illustration illustration
+     * @param extension extension
+     */
     public void addEntry(String expression, String meaning, BufferedImage illustration, String extension)
     {
         try
@@ -102,6 +145,11 @@ public class ListDataControl extends javax.swing.AbstractListModel<String>
         }
     }
     
+    /**
+     * Récupère une illustration
+     * @param index indice de l'entrée dont on doit récupérer l'illustration
+     * @return l'illustration correspondantes
+     */
     public byte[] retrieveIllustration(int index)
     {
         try
